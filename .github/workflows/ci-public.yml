@@ -1,0 +1,50 @@
+# Public release CI: no vcpkg, no HEIC DLLs (matches scripts/build-public.ps1).
+
+name: CI (public)
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - "public/**"
+      - "docs/PERFORMANCE_ROADMAP.md"
+  pull_request:
+    paths-ignore:
+      - "public/**"
+      - "docs/PERFORMANCE_ROADMAP.md"
+  workflow_dispatch:
+
+jobs:
+  test-and-build-public:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src-tauri
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+        working-directory: .
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - name: Run cargo test (no heic feature)
+        run: cargo test --no-default-features
+      - name: Build public Tauri app
+        working-directory: .
+        env:
+          GV_PIXARA_PUBLIC: "1"
+        run: npm run tauri build -- -- --no-default-features
+      - name: Verify no HEIC DLLs beside release exe
+        shell: pwsh
+        run: |
+          $dir = "src-tauri/target/release"
+          foreach ($dll in @("heif.dll", "libde265.dll", "libx265.dll")) {
+            if (Test-Path "$dir/$dll") {
+              throw "Public build must not produce $dll"
+            }
+          }
