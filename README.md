@@ -2,95 +2,146 @@
   <img src="gv-logo.png" alt="GV Pixara" width="120" />
 </p>
 
-# GV Pixara
+<h1 align="center">GV Pixara</h1>
 
-**GV Pixara** is a minimal **Windows** desktop app for batch image conversion. Everything runs on your PC: drag and drop files, folders, or ZIP archives, pick formats and presets, and convert locally. No cloud upload.
+<p align="center">
+  <strong>Batch image conversion for Windows — local, private, and fast.</strong>
+</p>
 
-**License:** [MIT](LICENSE) | **Privacy:** [docs/PRIVACY.md](docs/PRIVACY.md)
+<p align="center">
+  <a href="https://github.com/uhaop/pixara/releases/latest"><img src="https://img.shields.io/github/v/release/uhaop/pixara?label=Release" alt="Latest release" /></a>
+  <a href="https://github.com/uhaop/pixara/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
+  <a href="https://github.com/uhaop/pixara/actions"><img src="https://img.shields.io/github/actions/workflow/status/uhaop/pixara/ci-public.yml?branch=main&label=CI" alt="CI" /></a>
+</p>
+
+<p align="center">
+  <a href="#download">Download</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#supported-formats">Formats</a> ·
+  <a href="#privacy">Privacy</a> ·
+  <a href="#build-from-source">Developers</a>
+</p>
+
+---
+
+**GV Pixara** is a lightweight Windows desktop app for converting images in bulk. Drop files, folders, or ZIP archives onto the window, choose output formats and quality presets, and convert entirely on your machine. Nothing is uploaded to the cloud.
+
+| | |
+|---|---|
+| **Platform** | Windows 10 or 11 (64-bit) |
+| **License** | [MIT](LICENSE) |
+| **Privacy policy** | [docs/PRIVACY.md](docs/PRIVACY.md) |
+| **Third-party notices** | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
 
 ---
 
 ## Download
 
-Get the latest build from **[GitHub Releases](https://github.com/uhaop/pixara/releases/latest)**.
+Install the latest build from **[GitHub Releases](https://github.com/uhaop/pixara/releases/latest)**.
 
-| Option | File on Releases | What to do |
-|--------|------------------|------------|
-| **Portable (recommended)** | `GVPixara-portable-win64.zip` | Unzip, open the `GVPixara` folder, run `gv-pixara.exe` |
-| **Installer** | `GV Pixara_*_x64_en-US.msi` or `GV Pixara_*_x64-setup.exe` | Run the installer, then start **GV Pixara** from the Start Menu |
+| Option | Release asset | How to run |
+|--------|---------------|------------|
+| **Portable** *(recommended)* | `GVPixara-portable-win64.zip` | Unzip, open the `GVPixara` folder, run `gv-pixara.exe` |
+| **MSI installer** | `GV Pixara_*_x64_en-US.msi` | Run the installer, then launch **GV Pixara** from the Start Menu |
+| **Setup (NSIS)** | `GV Pixara_*_x64-setup.exe` | Alternative installer if you prefer the setup wizard |
 
-> Keep `gv-pixara.exe` inside the `GVPixara` folder for the portable ZIP. Do not move the exe out alone.
+> **Portable tip:** Keep `gv-pixara.exe` inside the `GVPixara` folder. Do not move the executable out on its own.
 
-**Requirements:** Windows 10 or 11 (64-bit). [WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) is required (usually already installed). Node.js and Rust are **not** needed to run the downloaded app.
+**Runtime requirements**
 
----
-
-## How to use
-
-### 1. Add images
-
-- **Drag and drop** images, a folder, or a `.zip` onto the window, or  
-- Use **Images**, **Folder**, or **ZIP** to browse.
-
-The queue shows each file, source format, and target format. Use **List** or **Grid** view (icons in the queue toolbar).
-
-### 2. Choose conversion options (right panel â†’ **Convert**)
-
-| Control | Purpose |
-|---------|---------|
-| **From** | Filter what gets ingested (e.g. only PNG) |
-| **To** | Output format (WebP, JPEG, PNG, AVIF, etc.) |
-| **Preset** | **Web**, **High**, or **Smallest** (quality for JPEG / WebP / AVIF when supported) |
-| **Output** | **Same folder** as sources, or **Custom** directory |
-
-Click **Convert all** or select rows and use **Convert selected**. **Estimate** previews approximate output size before a large batch.
-
-### 3. Defaults and privacy (**Settings** tab or gear icon in the header)
-
-Open **Settings** to change options that are **saved for next time** (stored in `%APPDATA%/com.gv.gv-pixara/gv-pixara/config.json`):
-
-- Output naming, overwrite behavior, max width/height  
-- Skip same format, PNG optimization, slow drive mode  
-- Re-zip outputs when the queue came from a ZIP  
-
-Converted files have **GPS and camera EXIF removed** by default. See [docs/PRIVACY.md](docs/PRIVACY.md). Originals on disk are not modified unless you overwrite outputs.
-
-### 4. After conversion
-
-- **Open output folder** opens the folder where files were written  
-- **Retry failed** if some items errored  
-- **Clear** empties the queue and cleans temp extract folders under `%TEMP%/gv-pixara/`
+- Windows 10 or 11, 64-bit
+- [Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/) (usually pre-installed on Windows 11)
+- No Node.js, Rust, or developer tools required for the downloaded app
 
 ---
 
-## Supported formats (public build)
+## Quick start
 
-| | Formats |
-|--|---------|
+1. **Add images** — Drag and drop images, a folder, or a `.zip` onto the window, or use **Images**, **Folder**, or **ZIP** to browse.
+2. **Set options** — In the right panel (**Convert** tab), choose **From** / **To** formats, a **Preset** (Web, High, or Smallest), and **Output** location (same folder or custom).
+3. **Convert** — Click **Convert all**, or select rows and use **Convert selected**. Use **Estimate** to preview approximate output sizes before a large batch.
+4. **Finish** — Use **Open output folder** when done. **Retry failed** handles errors; **Clear** empties the queue.
+
+The queue shows each file with source and target formats. Switch between **List** and **Grid** view from the queue toolbar.
+
+**Settings** (gear icon or **Settings** tab) persist between sessions at  
+`%APPDATA%/com.gv.gv-pixara/gv-pixara/config.json`.
+
+---
+
+## Features
+
+- **Batch conversion** — Process many files at once with per-file progress and before/after sizes
+- **Flexible input** — Single files, whole folders (with subfolder structure preserved), or ZIP archives
+- **Format control** — Filter ingestion with **From** and set **To** (WebP, JPEG, PNG, AVIF, GIF, BMP, TIFF)
+- **Quality presets** — **Web**, **High**, and **Smallest** for JPEG, WebP, and AVIF when supported
+- **Privacy-first exports** — GPS, camera, and other EXIF identity tags removed from converted outputs by default ([details](#privacy))
+- **Output flexibility** — Same folder as sources or a custom directory; optional `_converted` suffix or extension replace
+- **Resize & optimize** — Optional max width/height, PNG optimization, slow-drive mode, and re-zip for ZIP batches
+- **Skip unchanged** — **Skip same format** leaves matching files untouched on disk (including original metadata)
+
+Original files on disk are not modified unless you choose to overwrite existing outputs.
+
+---
+
+## Supported formats
+
+### Public release (default download)
+
+| Role | Formats |
+|------|---------|
 | **Input / output** | PNG, JPEG, WebP, AVIF, GIF, BMP, TIFF |
-| **HEIC / HEIF (iPhone)** | **Not included** in the default public download (smaller build, no bundled codec DLLs) |
+| **HEIC / HEIF (iPhone)** | Not bundled in the default public build (smaller download, no codec DLLs) |
 
 ### iPhone / HEIC photos
 
-1. Convert on the device to JPEG, or use another tool first, **or**  
-2. In Pixara, pick a non-HEIC **To** format (e.g. WebP or JPEG) if your file is already readable as a raster format.  
-3. **Optional:** run [setup-windows-heic.ps1](setup-windows-heic.ps1) once to install Microsoft HEIF/HEVC extensions (prepares Windows for future HEIC support in the app).
+The standard GitHub release does not include HEIC decode libraries. You can:
 
-Store links: [HEIF Image Extensions](https://apps.microsoft.com/store/detail/heif-image-extensions/9pm4mvwc71mp) Â· [HEVC Video Extensions](https://apps.microsoft.com/store/detail/hevc-video-extensions/9nmzlz57r3t7)
+1. **Convert on the device** — Export photos as JPEG from the Photos app, or use another tool first.
+2. **Prepare Windows (optional)** — Run [setup-windows-heic.ps1](setup-windows-heic.ps1) once to install Microsoft HEIF/HEVC extensions via winget (useful if native HEIC support is added later).
 
----
-
-## Tips
-
-- **JPEG â†’ JPEG** always loses quality; keep a PNG/WebP master if you will edit again.  
-- **Transparency** on JPEG (and HEIC when available) is flattened using the background color in **Settings**.  
-- **Animated GIF/WebP:** only the first frame is converted.  
-- **ZIP batches** need free disk space under `%TEMP%/gv-pixara/` during conversion; outputs are written beside the archive or your chosen output folder.  
-- **Skip same format** (Settings): matching files are left unchanged on disk, including all original metadata.
+Microsoft Store links: [HEIF Image Extensions](https://apps.microsoft.com/detail/9pm4mvwc71mp) · [HEVC Video Extensions](https://apps.microsoft.com/detail/9nmzlz57r3t7)
 
 ---
 
-## Build from source (developers)
+## Privacy
+
+Converted files have **GPS, location, and camera EXIF removed** by default. Orientation is baked into pixels so outputs do not depend on an Orientation tag. See [docs/PRIVACY.md](docs/PRIVACY.md) for the full policy.
+
+| Setting | Behavior |
+|---------|----------|
+| **Default conversion** | New outputs are stripped of GPS and EXIF identity tags |
+| **Skip same format** | Matching files are **not** re-encoded; originals (and all metadata) stay unchanged |
+| **Keep color profile (ICC)** | Optional for PNG when color accuracy matters |
+
+To strip metadata from files that already match the target format, turn **Skip same format** off so they are re-encoded.
+
+---
+
+## Tips & limitations
+
+- **JPEG → JPEG** always loses quality (generation loss). Keep a PNG or WebP master if you plan to edit again.
+- **Transparency** — JPEG targets flatten alpha using the background color in **Settings**.
+- **Animated GIF / WebP** — Only the first frame is converted.
+- **ZIP batches** — Archives extract under `%TEMP%/gv-pixara/`; ensure enough free disk space. Outputs go beside the archive or your chosen output folder.
+- **Overwrite** — Configure overwrite behavior in **Settings** to avoid accidental replacement.
+
+---
+
+## Build from source
+
+For contributors and developers who want to run or package the app locally.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) 18+
+- [Rust](https://rustup.rs/) (stable)
+- Visual Studio 2022 Build Tools with the **Desktop development with C++** workload
+
+The public repository is built **without** the default HEIC feature — no vcpkg or codec DLLs required for development.
+
+### Development
 
 ```powershell
 git clone https://github.com/uhaop/pixara.git
@@ -99,16 +150,17 @@ npm install
 npm run tauri dev
 ```
 
-Public clone uses **no** default HEIC feature â€” no vcpkg required for dev.
-
-**Release-style build** (matches GitHub portable):
+### Release-style build (matches GitHub portable)
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-public.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\pre-ship.ps1
 ```
 
-Output: `dist-public/GVPixara/gv-pixara.exe` and `dist-public/GVPixara-portable-win64.zip`.
+Artifacts:
+
+- `dist-public/GVPixara/gv-pixara.exe`
+- `dist-public/GVPixara-portable-win64.zip`
 
 Maintainers: see [PUBLISHING.md](PUBLISHING.md).
 
@@ -116,6 +168,16 @@ Maintainers: see [PUBLISHING.md](PUBLISHING.md).
 
 ## Links
 
-- **Latest release:** https://github.com/uhaop/pixara/releases/latest  
-- **Source:** https://github.com/uhaop/pixara  
-- **Issues:** https://github.com/uhaop/pixara/issues  
+| | URL |
+|---|-----|
+| **Latest release** | https://github.com/uhaop/pixara/releases/latest |
+| **Source code** | https://github.com/uhaop/pixara |
+| **Report an issue** | https://github.com/uhaop/pixara/issues |
+| **Privacy** | [docs/PRIVACY.md](docs/PRIVACY.md) |
+| **Third-party notices** | [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) |
+
+---
+
+<p align="center">
+  <sub>GV Pixara — convert images on your PC, not in the cloud.</sub>
+</p>

@@ -9,6 +9,28 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function Write-Utf8NoBom {
+    param([string]$Path, [string]$Content)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
+function Remove-Utf8BomFromFile {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) {
+        return
+    }
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+        $text = [System.IO.File]::ReadAllText($Path)
+        if ($text.Length -gt 0 -and [int][char]$text[0] -eq 0xFEFF) {
+            $text = $text.Substring(1)
+        }
+        Write-Utf8NoBom -Path $Path -Content $text
+    }
+}
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Split-Path -Parent $ScriptDir
 if (-not $ManifestPath) {
@@ -73,8 +95,7 @@ $ReadmeDest = Join-Path $Destination "README.md"
 $readme = Get-Content $ReadmeSource -Raw
 $readme = $readme -replace "YOUR_ORG", $Owner
 $readme = $readme -replace "YOUR_REPO", $Repo
-$utf8NoBom = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($ReadmeDest, $readme, $utf8NoBom)
+Write-Utf8NoBom -Path $ReadmeDest -Content $readme
 
 $LicenseSource = Join-Path $ProjectRoot $Manifest.licenseSource
 Copy-Item -Path $LicenseSource -Destination (Join-Path $Destination "LICENSE") -Force
@@ -100,7 +121,11 @@ if (Test-Path $PkgPath) {
     if (-not $pkg.homepage) {
         $pkg | Add-Member -NotePropertyName homepage -NotePropertyValue $RepoUrl -Force
     }
-    $pkg | ConvertTo-Json -Depth 10 | Set-Content -Path $PkgPath -Encoding utf8
+    Write-Utf8NoBom -Path $PkgPath -Content ($pkg | ConvertTo-Json -Depth 10)
+}
+
+foreach ($json in @("tsconfig.json", "tsconfig.node.json", "components.json")) {
+    Remove-Utf8BomFromFile -Path (Join-Path $Destination $json)
 }
 
 foreach ($junk in @("node_modules", "src-tauri\target", "dist", "dist-public", "dist-portable")) {
@@ -115,7 +140,7 @@ $CargoPath = Join-Path $Destination "src-tauri\Cargo.toml"
 if (Test-Path $CargoPath) {
     $cargo = Get-Content $CargoPath -Raw
     $cargo = $cargo -replace 'default = \["heic"\]', 'default = []'
-    Set-Content -Path $CargoPath -Value $cargo -Encoding utf8 -NoNewline
+    Write-Utf8NoBom -Path $CargoPath -Content $cargo
 }
 
 Write-Host "Public export written to $Destination"
