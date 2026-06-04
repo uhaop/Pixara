@@ -92,7 +92,7 @@ foreach ($rel in $Manifest.includePaths) {
 
 $ReadmeSource = Join-Path $ProjectRoot $Manifest.readmeSource
 $ReadmeDest = Join-Path $Destination "README.md"
-$readme = Get-Content $ReadmeSource -Raw
+$readme = Get-Content $ReadmeSource -Raw -Encoding UTF8
 $readme = $readme -replace "YOUR_ORG", $Owner
 $readme = $readme -replace "YOUR_REPO", $Repo
 Write-Utf8NoBom -Path $ReadmeDest -Content $readme
