@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="gv-logo.png" alt="GV Pixara" width="120" />
-</p>
-
-<h1 align="center">GV Pixara</h1>
+<h1 align="center">Pixara</h1>
 
 <p align="center">
   <strong>Batch image conversion for Windows — local, private, and fast.</strong>
