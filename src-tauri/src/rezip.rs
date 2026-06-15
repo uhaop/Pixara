@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::copy;
 use std::path::{Path, PathBuf};
 
 use zip::write::SimpleFileOptions;
@@ -43,11 +43,7 @@ pub fn create_converted_zip(
             .start_file(&normalized, options)
             .map_err(|e| GvError::Zip(e.to_string()))?;
         let mut input = File::open(path)?;
-        let mut buffer = Vec::new();
-        input.read_to_end(&mut buffer)?;
-        writer
-            .write_all(&buffer)
-            .map_err(|e| GvError::Zip(e.to_string()))?;
+        copy(&mut input, &mut writer).map_err(|e| GvError::Zip(e.to_string()))?;
         entries_added += 1;
     }
 
@@ -103,7 +99,7 @@ mod tests {
 
     #[test]
     fn creates_converted_zip_next_to_source() {
-        let dir = temp_dir("gv-pixara-rezip");
+        let dir = temp_dir("pixara-rezip");
         let source_zip = dir.join("photos.zip");
         {
             let file = File::create(&source_zip).expect("create zip");
@@ -141,7 +137,7 @@ mod tests {
 
     #[test]
     fn rejects_empty_rezip_when_no_files_exist() {
-        let dir = temp_dir("gv-pixara-rezip-empty");
+        let dir = temp_dir("pixara-rezip-empty");
         let source_zip = dir.join("photos.zip");
         fs::write(&source_zip, b"zip-placeholder").expect("write zip");
 

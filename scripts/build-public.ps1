@@ -1,4 +1,4 @@
-# GV Pixara — public GitHub release build (no vcpkg, no HEIC DLLs, no libheif link).
+# Pixara — public GitHub release build (no vcpkg, no HEIC DLLs, no libheif link).
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -10,22 +10,22 @@ if (Test-Path $CargoBin) {
     $env:Path = "$CargoBin;$env:Path"
 }
 
-$env:GV_PIXARA_PUBLIC = "1"
+$env:PIXARA_PUBLIC = "1"
 
-Write-Host "Building public GV Pixara (GV_PIXARA_PUBLIC=1, Cargo --no-default-features)..."
+Write-Host "Building public Pixara (PIXARA_PUBLIC=1, Cargo --no-default-features)..."
 npm run tauri build -- -- --no-default-features
 if ($LASTEXITCODE -ne 0) {
     throw "tauri build failed (exit $LASTEXITCODE)."
 }
 
 $ReleaseDir = Join-Path $ProjectRoot "src-tauri\target\release"
-$ExePath = Join-Path $ReleaseDir "gv-pixara.exe"
+$ExePath = Join-Path $ReleaseDir "pixara.exe"
 if (-not (Test-Path $ExePath)) {
     throw "Build did not produce $ExePath"
 }
 
 $DistRoot = Join-Path $ProjectRoot "dist-public"
-$PortableDir = Join-Path $DistRoot "GVPixara"
+$PortableDir = Join-Path $DistRoot "Pixara"
 $InstallerDir = Join-Path $DistRoot "installers"
 
 New-Item -ItemType Directory -Force -Path $PortableDir | Out-Null
@@ -54,7 +54,7 @@ foreach ($sourceDir in @($MsiSourceDir, $NsisSourceDir)) {
 
 Write-Host ""
 Write-Host "Public distribution outputs under $DistRoot"
-Write-Host "  Portable: $PortableDir  (gv-pixara.exe only)"
+Write-Host "  Portable: $PortableDir  (pixara.exe only)"
 foreach ($installer in $CopiedInstallers) {
     Write-Host "  Installer: $installer"
 }

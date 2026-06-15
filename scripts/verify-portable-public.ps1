@@ -1,4 +1,4 @@
-# Verify a public portable folder: gv-pixara.exe only (no HEIC codec DLLs).
+# Verify a public portable folder: pixara.exe only (no HEIC codec DLLs).
 
 param(
     [Parameter(Mandatory = $true)]
@@ -7,9 +7,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$ExePath = Join-Path $PortableDir "gv-pixara.exe"
+$ExePath = Join-Path $PortableDir "pixara.exe"
 if (-not (Test-Path $ExePath)) {
-    throw "gv-pixara.exe not found in $PortableDir"
+    throw "pixara.exe not found in $PortableDir"
 }
 
 $Forbidden = @("heif.dll", "libde265.dll", "libx265.dll", "aom.dll")

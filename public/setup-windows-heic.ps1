@@ -1,5 +1,5 @@
 # Install Microsoft HEIF/HEVC codecs for iPhone-style photos on Windows.
-# Run once per machine (admin may be required for winget). Does not install GV Pixara.
+# Run once per machine (admin may be required for winget). Does not install Pixara.
 
 $ErrorActionPreference = "Stop"
 
@@ -20,5 +20,5 @@ winget install --id Microsoft.HEIFImageExtension -e --accept-source-agreements -
 Write-Host "Installing HEVC Video Extensions (required for most iPhone HEIC)..."
 winget install --id Microsoft.HEVCVideoExtension -e --accept-source-agreements --accept-package-agreements
 
-Write-Host "Done. Restart GV Pixara if it was open."
+Write-Host "Done. Restart Pixara if it was open."
 Write-Host "Note: HEIC import in the default public build is not enabled yet; this prepares your PC for upcoming Windows-native HEIC support."

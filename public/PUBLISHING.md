@@ -1,4 +1,4 @@
-# Publishing GV Pixara to GitHub (public)
+# Publishing Pixara to GitHub (public)
 
 Public repository: **https://github.com/uhaop/pixara**
 
@@ -23,7 +23,7 @@ Public repository: **https://github.com/uhaop/pixara**
    cd ..\pixara
    git init
    git add .
-   git commit -m "Initial public export of GV Pixara"
+   git commit -m "Initial public export of Pixara"
    git branch -M main
    git remote add origin https://github.com/uhaop/pixara.git
    git push -u origin main
@@ -37,19 +37,21 @@ Public repository: **https://github.com/uhaop/pixara**
    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-public.ps1
    ```
 
-2. Pre-ship checks (smoke test, stale installer cleanup, release ZIP):
+2. Pre-ship checks (smoke test both portables, stale installer cleanup, release ZIP):
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\pre-ship.ps1
    ```
 
+   Pre-ship runs `verify-portable.ps1` on `dist-portable/Pixara/` and `verify-portable-public.ps1` on `dist-public/Pixara/`.
+
 3. Create a [GitHub Release](https://github.com/uhaop/pixara/releases/new) (e.g. tag `v0.1.0`) and upload:
 
    | Asset | Source |
    |-------|--------|
-   | `GVPixara-portable-win64.zip` | `dist-public/GVPixara-portable-win64.zip` |
-   | `GV Pixara_*_x64_en-US.msi` | `dist-public/installers/*.msi` |
-   | `GV Pixara_*_x64-setup.exe` | `dist-public/installers/*-setup.exe` |
+   | `Pixara-portable-win64.zip` | `dist-public/Pixara-portable-win64.zip` |
+   | `Pixara_*_x64_en-US.msi` | `dist-public/installers/*.msi` |
+   | `Pixara_*_x64-setup.exe` | `dist-public/installers/*-setup.exe` |
 
 4. Release notes: link to [README](README.md) quick start and optional [setup-windows-heic.ps1](setup-windows-heic.ps1) for iPhone users.
 

@@ -1,4 +1,4 @@
-# GV Pixara — metadata & privacy
+# Pixara — metadata & privacy
 
 ## Policy
 

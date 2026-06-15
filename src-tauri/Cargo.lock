@@ -1721,31 +1721,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gv-pixara"
-version = "0.1.0"
-dependencies = [
- "image",
- "kamadak-exif",
- "libheif-rs",
- "oxipng",
- "png 0.17.16",
- "rayon",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-opener",
- "tempfile",
- "thiserror 2.0.18",
- "uuid",
- "walkdir",
- "webp",
- "windows",
- "zip",
-]
-
-[[package]]
 name = "half"
 version = "2.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3137,6 +3112,31 @@ dependencies = [
  "atomic-waker",
  "fastrand",
  "futures-io",
+]
+
+[[package]]
+name = "pixara"
+version = "0.1.0"
+dependencies = [
+ "image",
+ "kamadak-exif",
+ "libheif-rs",
+ "oxipng",
+ "png 0.17.16",
+ "rayon",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-opener",
+ "tempfile",
+ "thiserror 2.0.18",
+ "uuid",
+ "walkdir",
+ "webp",
+ "windows",
+ "zip",
 ]
 
 [[package]]

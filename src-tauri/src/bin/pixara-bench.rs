@@ -1,19 +1,19 @@
 //! CLI for headless conversion benchmarks (Phase 0).
 //!
-//! Build: `cargo build --release --bin gv-bench`
-//! HEIC: copy vcpkg DLLs next to gv-bench.exe (see scripts/bench-convert.ps1).
+//! Build: `cargo build --release --bin pixara-bench`
+//! HEIC: copy vcpkg DLLs next to pixara-bench.exe (see scripts/bench-convert.ps1).
 
 use std::env;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use gv_pixara_lib::bench::{self, BenchResult};
+use pixara_lib::bench::{self, BenchResult};
 
 fn usage() -> &'static str {
-    r#"gv-bench — headless batch conversion timing
+    r#"pixara-bench — headless batch conversion timing
 
 Usage:
-  gv-bench --input <dir> --output <dir> [options]
+  pixara-bench --input <dir> --output <dir> [options]
 
 Options:
   --format <png|jpeg|webp|heic|...>   Target format (default: png)

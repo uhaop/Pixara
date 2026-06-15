@@ -105,9 +105,9 @@ if (Test-Path $NoticesSource) {
     Copy-Item -Path $NoticesSource -Destination (Join-Path $Destination "THIRD_PARTY_NOTICES.md") -Force
 }
 
-$LogoSource = Join-Path $ProjectRoot "public\gv-logo.png"
-if (Test-Path $LogoSource) {
-    Copy-Item -Path $LogoSource -Destination (Join-Path $Destination "gv-logo.png") -Force
+$IconSource = Join-Path $ProjectRoot "public\pixara-icon.png"
+if (Test-Path $IconSource) {
+    Copy-Item -Path $IconSource -Destination (Join-Path $Destination "pixara-icon.png") -Force
 }
 
 # Public package.json: allow publishing metadata

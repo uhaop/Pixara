@@ -30,6 +30,7 @@ impl HeicDecoder for LibheifDecoder {
 }
 
 #[cfg(windows)]
+#[derive(Clone)]
 struct FfmpegHwDecoder {
     ffmpeg: PathBuf,
     hwaccel: String,
@@ -44,10 +45,15 @@ impl HeicDecoder for FfmpegHwDecoder {
 
 #[cfg(windows)]
 fn primary_hw_decoder() -> Option<FfmpegHwDecoder> {
-    let ffmpeg = bundled_ffmpeg_path()?;
-    let hwaccels = probe_ffmpeg_hwaccels(&ffmpeg);
-    let hwaccel = preferred_heic_hwaccel(&hwaccels)?;
-    Some(FfmpegHwDecoder { ffmpeg, hwaccel })
+    static DECODER: OnceLock<Option<FfmpegHwDecoder>> = OnceLock::new();
+    DECODER
+        .get_or_init(|| {
+            let ffmpeg = bundled_ffmpeg_path()?;
+            let hwaccels = probe_ffmpeg_hwaccels(&ffmpeg);
+            let hwaccel = preferred_heic_hwaccel(&hwaccels)?;
+            Some(FfmpegHwDecoder { ffmpeg, hwaccel })
+        })
+        .clone()
 }
 
 pub fn load_heic(path: &Path) -> Result<DynamicImage, GvError> {
@@ -57,7 +63,17 @@ pub fn load_heic(path: &Path) -> Result<DynamicImage, GvError> {
     if let Some(decoder) = primary_hw_decoder() {
         return match decoder.decode(path) {
             Ok(img) => Ok(img),
-            Err(_) => cpu.decode(path),
+            Err(hw_err) => match cpu.decode(path) {
+                Ok(img) => {
+                    eprintln!(
+                        "pixara: FFmpeg HEIC hardware decode failed, used CPU fallback: {hw_err}"
+                    );
+                    Ok(img)
+                }
+                Err(cpu_err) => Err(GvError::Message(format!(
+                    "FFmpeg hardware decode failed ({hw_err}); CPU fallback also failed: {cpu_err}"
+                ))),
+            },
         };
     }
 

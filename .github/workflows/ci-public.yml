@@ -37,7 +37,7 @@ jobs:
       - name: Build public Tauri app
         working-directory: .
         env:
-          GV_PIXARA_PUBLIC: "1"
+          PIXARA_PUBLIC: "1"
         run: npm run tauri build -- -- --no-default-features
       - name: Verify no HEIC DLLs beside release exe
         shell: pwsh

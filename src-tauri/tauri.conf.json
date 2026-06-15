@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "GV Pixara",
+  "productName": "Pixara",
   "version": "0.1.0",
-  "identifier": "com.gv.gv-pixara",
+  "identifier": "com.uhaop.pixara",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
   "app": {
     "windows": [
       {
-        "title": "GV Pixara",
+        "title": "Pixara",
         "width": 960,
         "height": 680,
         "minWidth": 720,
@@ -26,7 +26,7 @@
         "enable": true,
         "scope": [
           "$TEMP/**",
-          "$TEMP/gv-pixara/**",
+          "$TEMP/pixara/**",
           "$DOCUMENT/**",
           "$PICTURE/**",
           "$DOWNLOAD/**",
@@ -46,6 +46,12 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico"
+      }
+    }
   }
 }

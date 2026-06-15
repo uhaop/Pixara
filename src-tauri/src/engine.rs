@@ -114,13 +114,20 @@ pub fn load_image(path: &Path) -> Result<DynamicImage, GvError> {
     if format_from_path(path) == Some(ImageFormat::Heic) {
         match heic_decode::load_heic(path) {
             Ok(img) => return Ok(img),
-            Err(e) => {
+            Err(heic_err) => {
                 #[cfg(not(feature = "heic"))]
-                return Err(e);
+                return Err(heic_err);
                 #[cfg(feature = "heic")]
                 {
-                    let _ = e;
                     ensure_heif_hooks();
+                    match image::open(path).map_err(GvError::from) {
+                        Ok(img) => return Ok(img),
+                        Err(image_err) => {
+                            return Err(GvError::Message(format!(
+                                "{heic_err}; fallback decode also failed: {image_err}"
+                            )));
+                        }
+                    }
                 }
             }
         }
@@ -584,7 +591,7 @@ mod tests {
     fn convert_strips_privacy_metadata_from_output() {
         use crate::privacy_strip::file_has_privacy_exif;
 
-        let dir = temp_dir("gv-pixara-privacy");
+        let dir = temp_dir("pixara-privacy");
         let source = dir.join("gps.jpg");
         write_jpeg_with_fake_exif_app1(&source);
 
@@ -601,7 +608,7 @@ mod tests {
 
     #[test]
     fn convert_png_to_webp_in_same_folder() {
-        let dir = temp_dir("gv-pixara-test");
+        let dir = temp_dir("pixara-test");
         let source = dir.join("sample.png");
         write_test_png(&source);
 
@@ -618,7 +625,7 @@ mod tests {
 
     #[test]
     fn skip_same_format_when_enabled() {
-        let dir = temp_dir("gv-pixara-skip");
+        let dir = temp_dir("pixara-skip");
         let source = dir.join("sample.png");
         write_test_png(&source);
 
@@ -635,7 +642,7 @@ mod tests {
 
     #[test]
     fn appends_suffix_and_avoids_collisions() {
-        let dir = temp_dir("gv-pixara-naming");
+        let dir = temp_dir("pixara-naming");
         let source = dir.join("sample.png");
         write_test_png(&source);
 
@@ -655,7 +662,7 @@ mod tests {
 
     #[test]
     fn preserves_relative_structure_in_custom_output_dir() {
-        let dir = temp_dir("gv-pixara-structure");
+        let dir = temp_dir("pixara-structure");
         let source_dir = dir.join("source").join("nested");
         fs::create_dir_all(&source_dir).expect("create source dir");
         let source = source_dir.join("sample.png");
@@ -680,7 +687,7 @@ mod tests {
 
     #[test]
     fn zip_same_folder_writes_beside_archive() {
-        let dir = temp_dir("gv-pixara-zip-out");
+        let dir = temp_dir("pixara-zip-out");
         let zip_path = dir.join("bundle.zip");
         fs::write(&zip_path, b"zip-placeholder").expect("write zip");
 
@@ -704,7 +711,7 @@ mod tests {
 
     #[test]
     fn rejects_zero_resize_limits() {
-        let dir = temp_dir("gv-pixara-resize");
+        let dir = temp_dir("pixara-resize");
         let source = dir.join("sample.png");
         write_test_png(&source);
 
@@ -714,6 +721,29 @@ mod tests {
 
         let err = convert_one(&item, &settings).expect_err("zero resize should fail");
         assert!(matches!(err, GvError::InvalidSettings(_)));
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn invalid_heic_surfaces_decode_error() {
+        let dir = temp_dir("pixara-heic-error");
+        let source = dir.join("bad.heic");
+        fs::write(&source, b"not-heic").expect("write bad heic");
+
+        let err = load_image(&source).expect_err("invalid heic should fail");
+        let msg = err.to_string();
+        #[cfg(feature = "heic")]
+        {
+            assert!(
+                msg.contains("fallback decode also failed"),
+                "expected combined error, got: {msg}"
+            );
+        }
+        #[cfg(not(feature = "heic"))]
+        {
+            assert!(msg.contains("HEIC is not available"), "got: {msg}");
+        }
 
         let _ = fs::remove_dir_all(dir);
     }

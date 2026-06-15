@@ -1,4 +1,8 @@
-import type { ImageFormat, TargetImageFormat } from "@/lib/types";
+import type {
+  ImageFormat,
+  SystemCapabilities,
+  TargetImageFormat,
+} from "@/lib/types";
 
 export type FormatOption<T extends string = string> = {
   value: T;
@@ -26,6 +30,23 @@ export const FORMAT_OPTIONS = {
   from: FROM_FORMAT_OPTIONS,
   to: TO_FORMAT_OPTIONS,
 } as const;
+
+/** Filter HEIC when the running build cannot read or write it. */
+export function formatOptionsForCapabilities(caps: SystemCapabilities | null): {
+  from: FormatOption<ImageFormat>[];
+  to: FormatOption<TargetImageFormat>[];
+} {
+  const heicRead = caps?.heicReadAvailable ?? false;
+  const heicWrite = caps?.heicWriteAvailable ?? false;
+  return {
+    from: FROM_FORMAT_OPTIONS.filter(
+      (option) => option.value !== "heic" || heicRead,
+    ),
+    to: TO_FORMAT_OPTIONS.filter(
+      (option) => option.value !== "heic" || heicWrite,
+    ),
+  };
+}
 
 export function formatBytes(bytes: number | null | undefined): string {
   if (bytes == null || Number.isNaN(bytes)) {

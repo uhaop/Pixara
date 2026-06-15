@@ -7,7 +7,6 @@ import {
   SettingsIcon,
   SquareIcon,
 } from "lucide-react";
-import appLogo from "@/assets/gv-logo.png";
 import { RightSidebar, type SidebarTab } from "@/components/right-sidebar";
 import { ConversionStatusBar } from "@/components/conversion-status-bar";
 import { DropZone } from "@/components/drop-zone";
@@ -30,6 +29,7 @@ export default function App() {
     progress,
     summary,
     isConverting,
+    isEstimating,
     isIngesting,
     isBrowsing,
     ingestPaths,
@@ -56,7 +56,7 @@ export default function App() {
     ? `${systemCaps.decodeNote} ${systemCaps.encodeNote} Thumbnails stay cached while you scroll. Clear queue to free temp files.`
     : "Drop images, folders, or ZIP archives. Thumbnails stay cached while you scroll.";
 
-  const busy = isConverting || isIngesting || isBrowsing;
+  const busy = isConverting || isEstimating || isIngesting || isBrowsing;
   const hasQueue = queue.length > 0;
   const hasErrors = queue.some((item) => item.status === "error");
   const hasSelection = queue.some((item) => item.selected);
@@ -64,16 +64,8 @@ export default function App() {
   return (
     <div className="flex h-svh flex-col overflow-hidden">
       <header className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2">
-        <h1 className="m-0 flex min-w-0 items-center gap-2 p-0">
-          <img
-            src={appLogo}
-            alt=""
-            aria-hidden
-            width={28}
-            height={28}
-            className="h-7 w-auto shrink-0 object-contain"
-          />
-          <span className="text-base font-semibold tracking-tight">Pixara</span>
+        <h1 className="m-0 min-w-0 p-0 text-base font-semibold tracking-tight">
+          Pixara
         </h1>
         <div className="flex items-center gap-1">
           <Tooltip>
@@ -148,6 +140,7 @@ export default function App() {
             onActiveTabChange={setSidebarTab}
             config={config}
             queue={queue}
+            systemCaps={systemCaps}
             onConfigChange={updateConfig}
             onBrowseOutputDirectory={browseOutputDirectory}
           />
@@ -169,7 +162,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
-              disabled={busy || queue.length === 0}
+              disabled={busy || queue.length === 0 || !systemCaps}
               onClick={() => void convert()}
             >
               {isConverting ? (
@@ -181,7 +174,7 @@ export default function App() {
             <Button
               type="button"
               variant="secondary"
-              disabled={busy || !hasSelection}
+              disabled={busy || !hasSelection || !systemCaps}
               onClick={() => void convertSelected()}
             >
               Convert selected
@@ -201,7 +194,7 @@ export default function App() {
             <Button
               type="button"
               variant="outline"
-              disabled={busy || queue.length === 0}
+              disabled={busy || queue.length === 0 || !systemCaps}
               onClick={() => void dryRunEstimate()}
             >
               Estimate

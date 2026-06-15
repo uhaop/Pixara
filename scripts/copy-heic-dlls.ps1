@@ -1,5 +1,5 @@
-# Copy libheif runtime DLLs from vcpkg next to gv-pixara.exe.
-# Required because gv-pixara links heif.dll dynamically (VCPKGRS_DYNAMIC=1).
+# Copy libheif runtime DLLs from vcpkg next to pixara.exe.
+# Required because pixara links heif.dll dynamically (VCPKGRS_DYNAMIC=1).
 
 param(
     [Parameter(Mandatory = $true)]
@@ -10,8 +10,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-if ($env:GV_PIXARA_PUBLIC -eq "1") {
-    Write-Host "GV_PIXARA_PUBLIC=1 - skipping HEIC DLL copy (public build)."
+if ($env:PIXARA_PUBLIC -eq "1") {
+    Write-Host "PIXARA_PUBLIC=1 - skipping HEIC DLL copy (public build)."
     exit 0
 }
 
@@ -38,7 +38,7 @@ foreach ($name in $RequiredDlls) {
         Copy-Item -Path $source -Destination $dest -Force
     } catch [System.IO.IOException] {
         if ($name -eq (Split-Path $dest -Leaf) -and (Test-Path $dest)) {
-            Write-Warning "Could not overwrite locked $name; existing copy kept. Close gv-pixara.exe and re-run if updating."
+            Write-Warning "Could not overwrite locked $name; existing copy kept. Close pixara.exe and re-run if updating."
             continue
         }
         throw

@@ -10,7 +10,7 @@ function Remove-StaleInstallers {
         return
     }
     Get-ChildItem -Path $InstallerDir -File | Where-Object {
-        $_.Name -like "GV Image_*"
+        $_.Name -like "GV Image_*" -or $_.Name -like "GV Pixara_*"
     } | ForEach-Object {
         Write-Host "Removing stale installer: $($_.FullName)"
         Remove-Item -LiteralPath $_.FullName -Force
@@ -22,7 +22,7 @@ function Test-PixaraPortable {
         [string]$Label,
         [string]$PortableDir
     )
-    $exe = Join-Path $PortableDir "gv-pixara.exe"
+    $exe = Join-Path $PortableDir "pixara.exe"
     if (-not (Test-Path $exe)) {
         throw "${Label}: missing $exe"
     }
@@ -47,7 +47,7 @@ function Test-PixaraPortable {
             throw "${Label}: no main window title within 15s (app may have failed to open)"
         }
         if ($title -notmatch "Pixara") {
-            throw "${Label}: unexpected window title '$title' (expected GV Pixara)"
+            throw "${Label}: unexpected window title '$title' (expected Pixara)"
         }
         Write-Host "Smoke test ($Label): OK - window title '$title'"
     } finally {
@@ -61,8 +61,8 @@ function Test-PixaraPortable {
 Remove-StaleInstallers (Join-Path $ProjectRoot "dist-portable\installers")
 Remove-StaleInstallers (Join-Path $ProjectRoot "dist-public\installers")
 
-$internalDir = Join-Path $ProjectRoot "dist-portable\GVPixara"
-$publicDir = Join-Path $ProjectRoot "dist-public\GVPixara"
+$internalDir = Join-Path $ProjectRoot "dist-portable\Pixara"
+$publicDir = Join-Path $ProjectRoot "dist-public\Pixara"
 
 Test-PixaraPortable -Label "internal" -PortableDir $internalDir
 Test-PixaraPortable -Label "public" -PortableDir $publicDir
@@ -71,12 +71,12 @@ Test-PixaraPortable -Label "public" -PortableDir $publicDir
 & (Join-Path $Root "verify-portable-public.ps1") -PortableDir $publicDir
 & (Join-Path $ProjectRoot "tools\verify-public-folder.ps1")
 
-$publicZip = Join-Path $ProjectRoot "dist-public\GVPixara-portable-win64.zip"
+$publicZip = Join-Path $ProjectRoot "dist-public\Pixara-portable-win64.zip"
 if (Test-Path $publicZip) {
     Remove-Item -LiteralPath $publicZip -Force
 }
 Write-Host "Creating $publicZip ..."
-# Zip includes GVPixara/ folder (matches public/README release layout).
+# Zip includes Pixara/ folder (matches public/README release layout).
 Compress-Archive -Path $publicDir -DestinationPath $publicZip -CompressionLevel Optimal
 $zipBytes = (Get-Item $publicZip).Length
 Write-Host "Public release zip: $publicZip"

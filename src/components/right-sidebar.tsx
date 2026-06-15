@@ -1,8 +1,7 @@
 import { ControlPanel } from "@/components/control-panel";
 import { SettingsPanel } from "@/components/settings-panel";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { AppConfig } from "@/lib/types";
-import type { UiQueueItem } from "@/lib/types";
+import type { AppConfig, SystemCapabilities, UiQueueItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export type SidebarTab = "conversion" | "settings";
@@ -12,6 +11,7 @@ type RightSidebarProps = {
   onActiveTabChange: (tab: SidebarTab) => void;
   config: AppConfig;
   queue: UiQueueItem[];
+  systemCaps: SystemCapabilities | null;
   onConfigChange: (patch: Partial<AppConfig>) => void;
   onBrowseOutputDirectory: () => void | Promise<void>;
 };
@@ -21,6 +21,7 @@ export function RightSidebar({
   onActiveTabChange,
   config,
   queue,
+  systemCaps,
   onConfigChange,
   onBrowseOutputDirectory,
 }: RightSidebarProps) {
@@ -57,6 +58,7 @@ export function RightSidebar({
         <ControlPanel
           config={config}
           queue={queue}
+          systemCaps={systemCaps}
           onConfigChange={onConfigChange}
           onBrowseOutputDirectory={onBrowseOutputDirectory}
         />

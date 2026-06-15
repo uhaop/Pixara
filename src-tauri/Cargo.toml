@@ -1,26 +1,26 @@
 [package]
-name = "gv-pixara"
+name = "pixara"
 version = "0.1.0"
-description = "GV Pixara - instant high-quality image conversion"
+description = "Pixara - instant high-quality image conversion"
 authors = ["GV"]
 edition = "2021"
-default-run = "gv-pixara"
+default-run = "pixara"
 
 [features]
 default = []
 heic = ["dep:libheif-rs"]
 
 [lib]
-name = "gv_pixara_lib"
+name = "pixara_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [[bin]]
-name = "gv-pixara"
+name = "pixara"
 path = "src/main.rs"
 
 [[bin]]
-name = "gv-bench"
-path = "src/bin/gv-bench.rs"
+name = "pixara-bench"
+path = "src/bin/pixara-bench.rs"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

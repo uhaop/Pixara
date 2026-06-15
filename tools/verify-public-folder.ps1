@@ -11,7 +11,7 @@ $ExpectedFiles = @(
     "THIRD_PARTY_NOTICES.md",
     "PUBLISHING.md",
     "setup-windows-heic.ps1",
-    "gv-logo.png",
+    "pixara-icon.png",
     "EXPECTED.md"
 )
 
@@ -39,13 +39,13 @@ foreach ($rel in $manifest.includePaths) {
     }
 }
 
-$assetsLogo = Join-Path $ProjectRoot "src\assets\gv-logo.png"
-$publicLogo = Join-Path $PublicDir "gv-logo.png"
-if ((Test-Path $assetsLogo) -and (Test-Path $publicLogo)) {
-    $a = (Get-FileHash $assetsLogo).Hash
-    $p = (Get-FileHash $publicLogo).Hash
+$tauriIcon = Join-Path $ProjectRoot "src-tauri\icons\128x128.png"
+$publicIcon = Join-Path $PublicDir "pixara-icon.png"
+if ((Test-Path $tauriIcon) -and (Test-Path $publicIcon)) {
+    $a = (Get-FileHash $tauriIcon).Hash
+    $p = (Get-FileHash $publicIcon).Hash
     if ($a -ne $p) {
-        Write-Warning "src/assets/gv-logo.png and public/gv-logo.png differ - sync before release."
+        Write-Warning "src-tauri/icons/128x128.png and public/pixara-icon.png differ - sync favicon before release."
     }
 }
 

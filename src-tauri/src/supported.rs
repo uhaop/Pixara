@@ -40,9 +40,43 @@ pub fn is_supported_image(path: &Path) -> bool {
     format_from_path(path).is_some()
 }
 
+pub fn heic_ingest_available() -> bool {
+    cfg!(feature = "heic")
+}
+
+pub fn is_ingestible_image(path: &Path) -> bool {
+    match format_from_path(path) {
+        Some(ImageFormat::Heic) if !heic_ingest_available() => false,
+        Some(_) => true,
+        None => false,
+    }
+}
+
 pub fn matches_from_filter(path: &Path, from_format: ImageFormat) -> bool {
     if from_format.is_any() {
-        return is_supported_image(path);
+        return is_ingestible_image(path);
+    }
+    if !heic_ingest_available() && from_format == ImageFormat::Heic {
+        return false;
     }
     format_from_path(path) == Some(from_format)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn heic_ingest_respects_feature_flag() {
+        let path = Path::new("photo.heic");
+        if cfg!(feature = "heic") {
+            assert!(is_ingestible_image(path));
+            assert!(matches_from_filter(path, ImageFormat::Any));
+        } else {
+            assert!(!is_ingestible_image(path));
+            assert!(!matches_from_filter(path, ImageFormat::Any));
+            assert!(!matches_from_filter(path, ImageFormat::Heic));
+        }
+    }
 }

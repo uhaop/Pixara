@@ -3,10 +3,12 @@ use std::fs;
 use std::path::PathBuf;
 
 fn main() {
+    println!("cargo:rerun-if-changed=icons/icon.ico");
+    println!("cargo:rerun-if-changed=tauri.conf.json");
     tauri_build::build();
 
     #[cfg(target_os = "windows")]
-    if env::var("CARGO_FEATURE_HEIC").is_ok() && env::var("GV_PIXARA_PUBLIC").is_err() {
+    if env::var("CARGO_FEATURE_HEIC").is_ok() && env::var("PIXARA_PUBLIC").is_err() {
         copy_heic_runtime_dlls();
     }
 }

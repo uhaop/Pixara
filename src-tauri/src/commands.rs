@@ -94,11 +94,12 @@ pub fn estimate_batch_cmd(
 
     let (estimated_output_bytes, sampled) = if accurate_sample && !items.is_empty() {
         match sample_based_estimate(&items, &settings) {
-            Some(bytes) => (bytes, true),
-            None => (
+            Ok(Some(bytes)) => (bytes, true),
+            Ok(None) => (
                 estimate_batch_output_bytes(&items, settings.preset, settings.to_format),
                 false,
             ),
+            Err(e) => return Err(e.to_string()),
         }
     } else {
         (
@@ -126,9 +127,13 @@ pub fn estimate_batch_cmd(
     })
 }
 
-fn sample_based_estimate(items: &[QueueItem], settings: &ConvertSettings) -> Option<u64> {
+fn sample_based_estimate(
+    items: &[QueueItem],
+    settings: &ConvertSettings,
+) -> Result<Option<u64>, &'static str> {
+    let _guard = ConvertInProgressGuard::try_acquire()?;
     const MAX_SAMPLES: usize = 3;
-    let temp = tempfile::tempdir().ok()?;
+    let temp = tempfile::tempdir().map_err(|_| "Failed to create temp directory for estimate")?;
     let mut sample_settings = settings.clone();
     sample_settings.optimize_png = false;
     sample_settings.output_mode = OutputMode::CustomDir;
@@ -152,12 +157,12 @@ fn sample_based_estimate(items: &[QueueItem], settings: &ConvertSettings) -> Opt
     }
 
     if sample_count == 0 || sample_in == 0 {
-        return None;
+        return Ok(None);
     }
 
     let ratio = sample_out as f64 / sample_in as f64;
     let total_in: u64 = items.iter().map(|i| i.size_bytes).sum();
-    Some((total_in as f64 * ratio).round().max(1.0) as u64)
+    Ok(Some((total_in as f64 * ratio).round().max(1.0) as u64))
 }
 
 fn run_convert_batch(
@@ -407,7 +412,7 @@ mod tests {
 
     #[test]
     fn overwrite_skip_avoids_existing_output() {
-        let dir = temp_dir("gv-pixara-overwrite-skip");
+        let dir = temp_dir("pixara-overwrite-skip");
         let source = dir.join("sample.png");
         write_test_png(&source);
         fs::write(dir.join("sample.webp"), b"existing").expect("seed");
@@ -424,7 +429,7 @@ mod tests {
 
     #[test]
     fn overwrite_replace_replaces_existing_output() {
-        let dir = temp_dir("gv-pixara-overwrite-replace");
+        let dir = temp_dir("pixara-overwrite-replace");
         let source = dir.join("sample.png");
         write_test_png(&source);
         fs::write(dir.join("sample.webp"), b"existing").expect("seed");
@@ -436,6 +441,22 @@ mod tests {
         let output = engine::convert_one(&item, &settings).expect("replace");
         assert!(output.exists());
         assert!(fs::metadata(&output).expect("meta").len() > 8);
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn sample_estimate_requires_convert_lock() {
+        let guard = ConvertInProgressGuard::try_acquire().expect("acquire convert lock");
+        let dir = temp_dir("pixara-estimate-lock");
+        let source = dir.join("sample.png");
+        write_test_png(&source);
+        let item = sample_item(&source, "sample.png");
+        let settings = base_settings();
+
+        let err = sample_based_estimate(&[item], &settings).expect_err("lock held");
+        assert_eq!(err, "A conversion batch is already running");
+        drop(guard);
 
         let _ = fs::remove_dir_all(dir);
     }

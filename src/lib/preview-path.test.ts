@@ -6,7 +6,7 @@ function item(partial: Partial<UiQueueItem>): UiQueueItem {
   return {
     id: "1",
     batchId: "b",
-    sourcePath: "C:\\temp\\gv-pixara\\batch\\photo.heic",
+    sourcePath: "C:\\temp\\pixara\\batch\\photo.heic",
     relativePath: "photo.heic",
     sourceFormat: "heic",
     sizeBytes: 100,
@@ -18,7 +18,7 @@ function item(partial: Partial<UiQueueItem>): UiQueueItem {
 
 describe("queueItemThumbnailPath", () => {
   it("always uses source path even when done", () => {
-    const source = "C:\\temp\\gv-pixara\\batch\\photo.heic";
+    const source = "C:\\temp\\pixara\\batch\\photo.heic";
     expect(
       queueItemThumbnailPath(
         item({

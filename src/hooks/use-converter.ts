@@ -3,6 +3,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { toast } from "sonner";
 import { clearThumbnailCache } from "@/lib/thumbnail-cache";
+import {
+  CONSERVATIVE_SYSTEM_CAPS,
+  configNeedsHeicSanitize,
+  sanitizeConfigForCapabilities,
+} from "@/lib/config-capabilities";
 import { validateBeforeConvert } from "@/lib/convert-validation";
 import {
   shouldSampleEstimate,
@@ -74,13 +79,17 @@ export function useConverter() {
   const [summary, setSummary] = useState<ConvertSummary | null>(null);
   const [estimate, setEstimate] = useState<BatchEstimate | null>(null);
   const [isConverting, setIsConverting] = useState(false);
+  const [isEstimating, setIsEstimating] = useState(false);
   const [isIngesting, setIsIngesting] = useState(false);
   const [isBrowsing, setIsBrowsing] = useState(false);
   const [systemCaps, setSystemCaps] = useState<SystemCapabilities | null>(null);
+  const [configLoaded, setConfigLoaded] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const browseLockRef = useRef(false);
   const configRef = useRef(config);
+  const systemCapsRef = useRef(systemCaps);
   configRef.current = config;
+  systemCapsRef.current = systemCaps;
 
   const persistConfig = useCallback(async (next: AppConfig) => {
     try {
@@ -138,7 +147,7 @@ export function useConverter() {
 
   const runBrowse = useCallback(
     async (action: () => Promise<void>) => {
-      if (browseLockRef.current || isConverting || isIngesting) {
+      if (browseLockRef.current || isConverting || isEstimating || isIngesting) {
         return;
       }
       browseLockRef.current = true;
@@ -150,7 +159,7 @@ export function useConverter() {
         setIsBrowsing(false);
       }
     },
-    [isConverting, isIngesting],
+    [isConverting, isEstimating, isIngesting],
   );
 
   const browseFiles = useCallback(async () => {
@@ -275,7 +284,7 @@ export function useConverter() {
       }
 
       const cfg = configRef.current;
-      const validationError = validateBeforeConvert(cfg);
+      const validationError = validateBeforeConvert(cfg, systemCapsRef.current, targets);
       if (validationError) {
         toast.error(validationError);
         return;
@@ -405,6 +414,15 @@ export function useConverter() {
       toast.message("No pending files to estimate");
       return;
     }
+
+    const cfg = configRef.current;
+    const validationError = validateBeforeConvert(cfg, systemCapsRef.current, targets);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    setIsEstimating(true);
     try {
       const settings = appConfigToConvertSettings(configRef.current);
       const accurateSample = shouldSampleEstimate(targets, configRef.current.toFormat);
@@ -432,6 +450,8 @@ export function useConverter() {
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsEstimating(false);
     }
   }, [queue]);
 
@@ -462,7 +482,10 @@ export function useConverter() {
   useEffect(() => {
     void invoke<SystemCapabilities>("get_system_capabilities_cmd")
       .then(setSystemCaps)
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        setSystemCaps(CONSERVATIVE_SYSTEM_CAPS);
+      });
   }, []);
 
   useEffect(() => {
@@ -473,16 +496,45 @@ export function useConverter() {
         if (cancelled) {
           return;
         }
-        setConfigState({ ...DEFAULT_APP_CONFIG, ...loaded });
+        const merged = { ...DEFAULT_APP_CONFIG, ...loaded };
+        const sanitized = sanitizeConfigForCapabilities(
+          merged,
+          systemCapsRef.current,
+        );
+        setConfigState(sanitized);
+        setConfigLoaded(true);
+        if (configNeedsHeicSanitize(merged, sanitized)) {
+          void persistConfig(sanitized);
+        }
       } catch (error) {
         console.error(error);
         toast.error("Could not load saved settings");
+        setConfigLoaded(true);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [persistConfig]);
+
+  useEffect(() => {
+    if (!systemCaps || !configLoaded) {
+      return;
+    }
+    setConfigState((current) => {
+      const next = sanitizeConfigForCapabilities(current, systemCaps);
+      if (!configNeedsHeicSanitize(current, next)) {
+        return current;
+      }
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+      }
+      saveTimer.current = setTimeout(() => {
+        void persistConfig(next);
+      }, 400);
+      return next;
+    });
+  }, [systemCaps, configLoaded, persistConfig]);
 
   useEffect(() => {
     let unlisten: UnlistenFn | undefined;
@@ -555,6 +607,7 @@ export function useConverter() {
     summary,
     estimate,
     isConverting,
+    isEstimating,
     isIngesting,
     isBrowsing,
     ingestPaths,

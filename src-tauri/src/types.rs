@@ -254,7 +254,7 @@ impl AppConfig {
     }
 }
 
-/// Per-file conversion stage timings (milliseconds), aggregated in gv-bench.
+/// Per-file conversion stage timings (milliseconds), aggregated in pixara-bench.
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ConvertStageMs {

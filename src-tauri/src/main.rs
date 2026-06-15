@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    gv_pixara_lib::run()
+    pixara_lib::run()
 }

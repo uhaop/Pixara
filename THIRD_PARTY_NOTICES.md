@@ -1,11 +1,11 @@
-# Third-party notices (GV Pixara — public build)
+# Third-party notices (Pixara — public build)
 
-The **public** Windows download (`gv-pixara.exe` portable or MSI) is built **without**
+The **public** Windows download (`pixara.exe` portable or MSI) is built **without**
 LGPL/GPL HEIC codec libraries. This file covers components that still apply to that build.
 
 ## Application stack
 
-GV Pixara is a Tauri 2 desktop app. Major components include:
+Pixara is a Tauri 2 desktop app. Major components include:
 
 - **Tauri** — https://github.com/tauri-apps/tauri (Apache-2.0 / MIT)
 - **Rust** ecosystem crates — see `src-tauri/Cargo.lock` after `cargo build`
@@ -31,5 +31,5 @@ part of the default GitHub release assets.
 
 ## Bundled FFmpeg (optional)
 
-If you place `ffmpeg.exe` beside `gv-pixara.exe`, FFmpeg’s license applies to that binary.
+If you place `ffmpeg.exe` beside `pixara.exe`, FFmpeg’s license applies to that binary.
 Use a build configuration and notice file matching your FFmpeg distribution.

@@ -23,9 +23,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { FORMAT_OPTIONS } from "@/lib/formats";
+import { selectFormatValues } from "@/lib/config-capabilities";
+import { formatOptionsForCapabilities } from "@/lib/formats";
 import { presetTooltip, presetUsesQuality } from "@/lib/preset-info";
-import type { AppConfig, OutputMode, Preset } from "@/lib/types";
+import type { AppConfig, OutputMode, Preset, SystemCapabilities } from "@/lib/types";
 import { shouldWarnHeicToPng } from "@/lib/estimate-warning";
 import type { UiQueueItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,7 @@ import { cn } from "@/lib/utils";
 type ControlPanelProps = {
   config: AppConfig;
   queue: UiQueueItem[];
+  systemCaps: SystemCapabilities | null;
   onConfigChange: (patch: Partial<AppConfig>) => void;
   onBrowseOutputDirectory: () => void | Promise<void>;
 };
@@ -43,9 +45,12 @@ const inputClassName =
 export function ControlPanel({
   config,
   queue,
+  systemCaps,
   onConfigChange,
   onBrowseOutputDirectory,
 }: ControlPanelProps) {
+  const formatOptions = formatOptionsForCapabilities(systemCaps);
+  const { fromFormat, toFormat } = selectFormatValues(config, systemCaps);
   const showJpegWarning = config.toFormat === "jpeg";
   const showSameFormatWarning =
     config.fromFormat !== "any" && config.fromFormat === config.toFormat;
@@ -61,7 +66,8 @@ export function ControlPanel({
         <Field>
           <FieldLabel htmlFor="from-format">From</FieldLabel>
           <Select
-            value={config.fromFormat}
+            disabled={!systemCaps}
+            value={fromFormat}
             onValueChange={(value) =>
               onConfigChange({ fromFormat: value as AppConfig["fromFormat"] })
             }
@@ -70,7 +76,7 @@ export function ControlPanel({
               <SelectValue placeholder="Source format" />
             </SelectTrigger>
             <SelectContent>
-              {FORMAT_OPTIONS.from.map((option) => (
+              {formatOptions.from.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -82,7 +88,8 @@ export function ControlPanel({
         <Field>
           <FieldLabel htmlFor="to-format">To</FieldLabel>
           <Select
-            value={config.toFormat}
+            disabled={!systemCaps}
+            value={toFormat}
             onValueChange={(value) =>
               onConfigChange({ toFormat: value as AppConfig["toFormat"] })
             }
@@ -91,7 +98,7 @@ export function ControlPanel({
               <SelectValue placeholder="Target format" />
             </SelectTrigger>
             <SelectContent>
-              {FORMAT_OPTIONS.to.map((option) => (
+              {formatOptions.to.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>

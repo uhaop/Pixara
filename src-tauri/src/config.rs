@@ -5,7 +5,7 @@ use tauri::Manager;
 
 use crate::types::{AppConfig, GvError, ImageFormat};
 
-const CONFIG_DIR: &str = "gv-pixara";
+const CONFIG_DIR: &str = "pixara";
 const CONFIG_FILE: &str = "config.json";
 
 fn config_path(app: &tauri::AppHandle) -> Result<PathBuf, GvError> {
@@ -19,8 +19,21 @@ fn config_path(app: &tauri::AppHandle) -> Result<PathBuf, GvError> {
 fn legacy_config_paths() -> Vec<PathBuf> {
     let mut paths = Vec::new();
     if let Ok(app_data) = std::env::var("APPDATA") {
+        let app_data = PathBuf::from(app_data);
         paths.push(
-            PathBuf::from(app_data)
+            app_data
+                .join("com.gv.gv-pixara")
+                .join("pixara")
+                .join(CONFIG_FILE),
+        );
+        paths.push(
+            app_data
+                .join("com.gv.gv-pixara")
+                .join("gv-pixara")
+                .join(CONFIG_FILE),
+        );
+        paths.push(
+            app_data
                 .join("com.gv.gv-image")
                 .join("gv-image")
                 .join(CONFIG_FILE),
@@ -38,6 +51,7 @@ fn migrate_legacy_config(app: &tauri::AppHandle) -> Result<Option<AppConfig>, Gv
         let cfg: AppConfig = serde_json::from_str(&data)?;
         let cfg = sanitize_config(cfg);
         save_config(app, &cfg)?;
+        let _ = fs::remove_file(&legacy);
         return Ok(Some(cfg));
     }
     Ok(None)
@@ -46,6 +60,15 @@ fn migrate_legacy_config(app: &tauri::AppHandle) -> Result<Option<AppConfig>, Gv
 pub fn sanitize_config(mut config: AppConfig) -> AppConfig {
     if config.to_format.is_any() {
         config.to_format = ImageFormat::Webp;
+    }
+    #[cfg(not(feature = "heic"))]
+    {
+        if config.from_format == ImageFormat::Heic {
+            config.from_format = ImageFormat::Any;
+        }
+        if config.to_format == ImageFormat::Heic {
+            config.to_format = ImageFormat::Webp;
+        }
     }
     if config.max_width == Some(0) {
         config.max_width = None;
@@ -119,6 +142,34 @@ mod tests {
         assert_eq!(sanitized.to_format, ImageFormat::Webp);
         assert_eq!(sanitized.max_width, None);
         assert_eq!(sanitized.max_height, None);
+    }
+
+    #[test]
+    #[cfg(not(feature = "heic"))]
+    fn sanitize_config_strips_heic_without_feature() {
+        let config = AppConfig {
+            from_format: ImageFormat::Heic,
+            to_format: ImageFormat::Heic,
+            preset: Preset::Web,
+            output_mode: OutputMode::SameFolder,
+            custom_output_dir: None,
+            preserve_structure: true,
+            naming: NamingMode::ReplaceExtension,
+            max_width: None,
+            max_height: None,
+            skip_same_format: true,
+            strip_icc: false,
+            rezip_outputs: false,
+            flatten_color: "#ffffff".to_string(),
+            overwrite_mode: crate::types::OverwriteMode::AutoRename,
+            optimize_png: true,
+            slow_drive_mode: false,
+            queue_view: crate::types::QueueView::List,
+        };
+
+        let sanitized = sanitize_config(config);
+        assert_eq!(sanitized.from_format, ImageFormat::Any);
+        assert_eq!(sanitized.to_format, ImageFormat::Webp);
     }
 
     #[test]

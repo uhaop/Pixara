@@ -205,8 +205,8 @@ mod tests {
 
     #[test]
     fn bench_png_smoke() {
-        let input = temp_dir("gv-bench-in");
-        let output = temp_dir("gv-bench-out");
+        let input = temp_dir("pixara-bench-in");
+        let output = temp_dir("pixara-bench-out");
         write_test_png(&input.join("sample.png"));
 
         let settings = bench_settings(ImageFormat::Png, Preset::Web, &output, false);

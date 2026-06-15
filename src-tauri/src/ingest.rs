@@ -8,7 +8,7 @@ use uuid::Uuid;
 use walkdir::WalkDir;
 use zip::ZipArchive;
 
-use crate::supported::{format_from_path, is_supported_image, matches_from_filter};
+use crate::supported::{format_from_path, is_ingestible_image, matches_from_filter};
 use crate::types::{GvError, ImageFormat, IngestResult, QueueItem};
 
 // ZIP extracts under temp_root() are removed when the UI calls cleanup_temp_batches
@@ -20,7 +20,7 @@ pub const MAX_ZIP_TOTAL_BYTES: u64 = 500 * 1024 * 1024;
 const STALE_TEMP_MAX_AGE: Duration = Duration::from_secs(24 * 60 * 60);
 
 pub fn temp_root() -> PathBuf {
-    std::env::temp_dir().join("gv-pixara")
+    std::env::temp_dir().join("pixara")
 }
 
 pub fn cleanup_temp_batches(batch_ids: impl IntoIterator<Item = impl AsRef<str>>) {
@@ -185,7 +185,7 @@ fn push_file(
     if !seen.insert(canonical) {
         return;
     }
-    if !is_supported_image(path) || !matches_from_filter(path, from_format) {
+    if !is_ingestible_image(path) || !matches_from_filter(path, from_format) {
         *skipped += 1;
         return;
     }
@@ -406,7 +406,7 @@ mod tests {
 
     #[test]
     fn zip_extract_remains_until_explicit_cleanup() {
-        let dir = temp_dir("gv-pixara-zip-retain");
+        let dir = temp_dir("pixara-zip-retain");
         let source_img = dir.join("input.png");
         write_test_png(&source_img);
         let bytes = fs::read(&source_img).expect("read png");
@@ -424,7 +424,7 @@ mod tests {
 
     #[test]
     fn ingest_zip_keeps_relative_paths() {
-        let dir = temp_dir("gv-pixara-ingest-zip");
+        let dir = temp_dir("pixara-ingest-zip");
         let source_img = dir.join("input.png");
         write_test_png(&source_img);
         let bytes = fs::read(&source_img).expect("read png");
@@ -436,7 +436,7 @@ mod tests {
             .expect("ingest zip");
         assert_eq!(result.items.len(), 1);
         assert_eq!(result.items[0].relative_path, "nested/photo.png");
-        assert!(result.items[0].source_path.contains("gv-pixara"));
+        assert!(result.items[0].source_path.contains("pixara"));
         assert_eq!(
             result.items[0].zip_source_path.as_deref(),
             zip_path.to_str()
@@ -448,7 +448,7 @@ mod tests {
 
     #[test]
     fn ingest_zip_extension_is_case_insensitive() {
-        let dir = temp_dir("gv-pixara-ingest-zip-case");
+        let dir = temp_dir("pixara-ingest-zip-case");
         let source_img = dir.join("input.png");
         write_test_png(&source_img);
         let bytes = fs::read(&source_img).expect("read png");
@@ -466,7 +466,7 @@ mod tests {
 
     #[test]
     fn ingest_rejects_zip_slip_paths() {
-        let dir = temp_dir("gv-pixara-ingest-slip");
+        let dir = temp_dir("pixara-ingest-slip");
         let zip_path = dir.join("evil.zip");
         write_zip(&zip_path, &[("../../escape.png", b"bad")]);
 
@@ -479,7 +479,7 @@ mod tests {
 
     #[test]
     fn ingest_deduplicates_same_file_paths() {
-        let dir = temp_dir("gv-pixara-ingest-dedupe");
+        let dir = temp_dir("pixara-ingest-dedupe");
         let source_img = dir.join("input.png");
         write_test_png(&source_img);
 
@@ -495,7 +495,7 @@ mod tests {
 
     #[test]
     fn cleanup_temp_batches_removes_extracted_files() {
-        let dir = temp_dir("gv-pixara-cleanup");
+        let dir = temp_dir("pixara-cleanup");
         let source_img = dir.join("input.png");
         write_test_png(&source_img);
         let bytes = fs::read(&source_img).expect("read png");
@@ -510,6 +510,23 @@ mod tests {
 
         cleanup_temp_batches([&result.batch_id]);
         assert!(!batch_dir.exists());
+
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn ingest_skips_heic_when_feature_disabled() {
+        if cfg!(feature = "heic") {
+            return;
+        }
+        let dir = temp_dir("pixara-ingest-heic");
+        let heic = dir.join("photo.heic");
+        fs::write(&heic, b"fake-heic").expect("write heic");
+
+        let result =
+            ingest_paths(&[heic.to_string_lossy().into_owned()], ImageFormat::Any).expect("ingest");
+        assert_eq!(result.items.len(), 0);
+        assert_eq!(result.skipped, 1);
 
         let _ = fs::remove_dir_all(dir);
     }

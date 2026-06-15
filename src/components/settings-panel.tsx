@@ -296,6 +296,12 @@ export function SettingsPanel({ config, queue, onConfigChange }: SettingsPanelPr
           <h2 className="font-heading text-sm font-medium">Privacy & metadata</h2>
           <MetadataNotice />
         </section>
+
+        <section className="flex flex-col gap-1 border-t pt-4">
+          <h2 className="font-heading text-sm font-medium">About</h2>
+          <p className="text-sm font-medium">Pixara</p>
+          <p className="text-xs text-muted-foreground">by Grasp Visual</p>
+        </section>
       </FieldGroup>
     </div>
   );

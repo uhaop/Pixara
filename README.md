@@ -4,6 +4,8 @@
   <strong>Batch image conversion for Windows — local, private, and fast.</strong>
 </p>
 
+<p align="center"><em>by Grasp Visual</em></p>
+
 <p align="center">
   <a href="https://github.com/uhaop/pixara/releases/latest"><img src="https://img.shields.io/github/v/release/uhaop/pixara?label=Release" alt="Latest release" /></a>
   <a href="https://github.com/uhaop/pixara/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
@@ -21,7 +23,7 @@
 
 ---
 
-**GV Pixara** is a lightweight Windows desktop app for converting images in bulk. Drop files, folders, or ZIP archives onto the window, choose output formats and quality presets, and convert entirely on your machine. Nothing is uploaded to the cloud.
+**Pixara** is a lightweight Windows desktop app for converting images in bulk. Drop files, folders, or ZIP archives onto the window, choose output formats and quality presets, and convert entirely on your machine. Nothing is uploaded to the cloud.
 
 | | |
 |---|---|
@@ -38,11 +40,11 @@ Install the latest build from **[GitHub Releases](https://github.com/uhaop/pixar
 
 | Option | Release asset | How to run |
 |--------|---------------|------------|
-| **Portable** *(recommended)* | `GVPixara-portable-win64.zip` | Unzip, open the `GVPixara` folder, run `gv-pixara.exe` |
-| **MSI installer** | `GV Pixara_*_x64_en-US.msi` | Run the installer, then launch **GV Pixara** from the Start Menu |
-| **Setup (NSIS)** | `GV Pixara_*_x64-setup.exe` | Alternative installer if you prefer the setup wizard |
+| **Portable** *(recommended)* | `Pixara-portable-win64.zip` | Unzip, open the `Pixara` folder, run `pixara.exe` |
+| **MSI installer** | `Pixara_*_x64_en-US.msi` | Run the installer, then launch **Pixara** from the Start Menu |
+| **Setup (NSIS)** | `Pixara_*_x64-setup.exe` | Alternative installer if you prefer the setup wizard |
 
-> **Portable tip:** Keep `gv-pixara.exe` inside the `GVPixara` folder. Do not move the executable out on its own.
+> **Portable tip:** Keep `pixara.exe` inside the `Pixara` folder. Do not move the executable out on its own.
 
 **Runtime requirements**
 
@@ -59,10 +61,10 @@ Install the latest build from **[GitHub Releases](https://github.com/uhaop/pixar
 3. **Convert** — Click **Convert all**, or select rows and use **Convert selected**. Use **Estimate** to preview approximate output sizes before a large batch.
 4. **Finish** — Use **Open output folder** when done. **Retry failed** handles errors; **Clear** empties the queue.
 
-The queue shows each file with source and target formats. Switch between **List** and **Grid** view from the queue toolbar.
+The queue shows each file with source and target formats. Switch between **List** and **Grid** view, sort and filter rows, and rename outputs from the queue toolbar.
 
-**Settings** (gear icon or **Settings** tab) persist between sessions at  
-`%APPDATA%/com.gv.gv-pixara/gv-pixara/config.json`.
+Use the right sidebar **Convert** tab for format and output options; **Settings** (tab or header gear icon) for defaults that persist between sessions at  
+`%APPDATA%/com.uhaop.pixara/pixara/config.json`.
 
 ---
 
@@ -72,6 +74,7 @@ The queue shows each file with source and target formats. Switch between **List*
 - **Flexible input** — Single files, whole folders (with subfolder structure preserved), or ZIP archives
 - **Format control** — Filter ingestion with **From** and set **To** (WebP, JPEG, PNG, AVIF, GIF, BMP, TIFF)
 - **Quality presets** — **Web**, **High**, and **Smallest** for JPEG, WebP, and AVIF when supported
+- **Queue tools** — List or grid view, sort and filter, select rows, inline and batch rename
 - **Privacy-first exports** — GPS, camera, and other EXIF identity tags removed from converted outputs by default ([details](#privacy))
 - **Output flexibility** — Same folder as sources or a custom directory; optional `_converted` suffix or extension replace
 - **Resize & optimize** — Optional max width/height, PNG optimization, slow-drive mode, and re-zip for ZIP batches
@@ -120,7 +123,7 @@ To strip metadata from files that already match the target format, turn **Skip s
 - **JPEG → JPEG** always loses quality (generation loss). Keep a PNG or WebP master if you plan to edit again.
 - **Transparency** — JPEG targets flatten alpha using the background color in **Settings**.
 - **Animated GIF / WebP** — Only the first frame is converted.
-- **ZIP batches** — Archives extract under `%TEMP%/gv-pixara/`; ensure enough free disk space. Outputs go beside the archive or your chosen output folder.
+- **ZIP batches** — Archives extract under `%TEMP%/pixara/`; ensure enough free disk space. Outputs go beside the archive or your chosen output folder.
 - **Overwrite** — Configure overwrite behavior in **Settings** to avoid accidental replacement.
 
 ---
@@ -155,8 +158,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\pre-ship.ps1
 
 Artifacts:
 
-- `dist-public/GVPixara/gv-pixara.exe`
-- `dist-public/GVPixara-portable-win64.zip`
+- `dist-public/Pixara/pixara.exe`
+- `dist-public/Pixara-portable-win64.zip`
 
 Maintainers: see [PUBLISHING.md](PUBLISHING.md).
 
@@ -175,5 +178,5 @@ Maintainers: see [PUBLISHING.md](PUBLISHING.md).
 ---
 
 <p align="center">
-  <sub>GV Pixara — convert images on your PC, not in the cloud.</sub>
+  <sub>Pixara — convert images on your PC, not in the cloud.</sub>
 </p>
