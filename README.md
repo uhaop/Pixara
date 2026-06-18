@@ -14,27 +14,27 @@ Batch image conversion for Windows. Drag and drop images, folders, or ZIP archiv
 
 ![Pixara — batch image conversion for Windows](docs/Example/Pixara-01.webp)
 
-1. **Add images** — Drop files, folders, or ZIP archives (or **Images** / **Folder** / **ZIP**).
+**Add images** — Drop files, folders, or ZIP archives (or **Images** / **Folder** / **ZIP**).
 
    ![Drop images, folders, or ZIP archives](docs/Example/Pixara-02.webp)
 
-2. **Choose format** — Set **From** / **To** in the **Convert** panel (PNG, JPEG, WebP, AVIF, GIF, BMP, TIFF).
+**Choose format** — Set **From** / **To** in the **Convert** panel (PNG, JPEG, WebP, AVIF, GIF, BMP, TIFF).
 
    ![Choose your output format](docs/Example/Pixara-03.webp)
 
-3. **Pick preset** — **Web**, **High**, or **Smallest**; **Same folder** or **Custom** output.
+**Pick preset** — **Web**, **High**, or **Smallest**; **Same folder** or **Custom** output.
 
    ![Pick a quality preset](docs/Example/Pixara-04.webp)
 
-4. **Estimate** — Preview approximate batch size before converting.
+**Estimate** — Preview approximate batch size before converting.
 
    ![Estimate output size](docs/Example/Pixara-05.webp)
 
-5. **Convert** — **Convert all** or **Convert selected**; progress runs locally on your PC.
+**Convert** — **Convert all** or **Convert selected**; progress runs locally on your PC.
 
    ![Convert locally with progress](docs/Example/Pixara-06.webp)
 
-6. **Review** — Compare **Size** and **After** columns; **Open output folder** when done. Defaults live in **Settings** (tab or header gear).
+**Review** — Compare **Size** and **After** columns; **Open output folder** when done. Defaults live in **Settings** (tab or header gear).
 
    ![See before and after file sizes](docs/Example/Pixara-07.webp)
 
