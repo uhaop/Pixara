@@ -73,6 +73,7 @@ foreach ($rel in $Manifest.includePaths) {
             $source,
             $target,
             "/E",
+            "/XF", "*.mp4",
             "/NFL", "/NDL", "/NJH", "/NJS", "/nc", "/ns", "/np"
         )
         foreach ($dir in $excludeDirs) {

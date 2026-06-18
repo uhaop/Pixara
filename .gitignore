@@ -32,3 +32,6 @@ scripts/bench/fixtures/png/*
 !scripts/bench/fixtures/png/.gitkeep
 scripts/bench/fixtures/heic/*
 !scripts/bench/fixtures/heic/.gitkeep
+
+# Local preview media (not shipped in repo)
+docs/Example/*.mp4
